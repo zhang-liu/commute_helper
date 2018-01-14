@@ -51,23 +51,27 @@ while True:
         req = requests.get(GOOGLE_MAPS_API_URL, params=params[i])
         res = req.json()
 
-        # Results
-        distance_m = res['routes'][0]['legs'][0]['distance']['value']
-        duration_s = res['routes'][0]['legs'][0]['duration_in_traffic']['value']
-        status = res['status']
+        # Extract commute data and write to csv file
+        try:
+            # Results
+            status = str(res['status'])
+            distance_m = res['routes'][0]['legs'][0]['distance']['value']
+            duration_s = res['routes'][0]['legs'][0]['duration_in_traffic']['value']
 
-        # Current time
-        now = datetime.datetime.now()
+            # Current time
+            now = datetime.datetime.now()
 
-        # Write to file
-        fh = open(filename[i], 'a')
-        line = now.strftime('%Y,%m,%d,%H,%M,%S') + ',%d,%.1f,%.1f,%s\n' \
-            % (now.weekday(), distance_m/1609.34, duration_s/60, status)
-        fh.write(line)
-        fh.close()
+            # Write to file
+            fh = open(filename[i], 'a')
+            line = now.strftime('%Y,%m,%d,%H,%M,%S') + ',%d,%.1f,%.1f,%s\n' \
+                % (now.weekday(), distance_m/1609.34, duration_s/60, status)
+            fh.write(line)
+            fh.close()
+        except Exception:
+            print('*** Error ***')
 
-        # Sleep 10 seconds
-        time.sleep(10)
+        # Sleep 15 seconds
+        time.sleep(15)
 
     # Sleep
-    time.sleep(sample_time - 10*num)
+    time.sleep(sample_time - 15*num)
